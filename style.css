@@ -7,7 +7,16 @@
     left: 250px;
 }
 
-#enemy{
+#game {
+    width: 800px;
+    height: 600px;
+    border: 3px solid black;
+    position: relative;
+    margin: 20px auto;
+    overflow: hidden;
+}
+
+.enemy{
     width: 25px;
     height: 25px;
     background-color: blue;
