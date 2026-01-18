@@ -6,8 +6,8 @@ function Game() {
     let positionX = 250;
 
     let bullets = [];
-    let bulletSpeedX = 20;
-    let bulletSpeedY = 20;
+    let bulletSpeed = 20;
+    let bulletSize = 8;
 
     game.addEventListener('click', (e) => {
         //debugger;
@@ -37,19 +37,17 @@ function Game() {
             y: playerCenterY,
             dx: dirX,
             dy: dirY,
-            speed: 8
+            speed: bulletSpeed
         });
     });
 
 
 
-    let enemy = document.getElementById('enemy');
     let enemies = [];
     let enemiesCount = 5;
-    let enemyX = 100;
-    let enemyY = 100;
     let enemySpeedX = 2;
     let enemySpeedY = 2;
+    let enemySize = 40;
 
     for (let i = 0; i < enemiesCount; i++) {
         let div = document.createElement('div');
@@ -90,19 +88,32 @@ function Game() {
         });
 
         enemies.forEach(enemy => {
-            enemy.x += enemy.speedX;
-            enemy.y += enemy.speedY;
-            //debugger;
-            if (enemy.x <= 0 || enemy.x >= game.clientWidth * 1.9 - enemy.x) {
-                enemy.speedX *= -1;
-            }
+            let dx = positionX - enemy.x;
+            let dy = positionY - enemy.y;
 
-            if (enemy.y <= 0 || enemy.y >= game.clientHeight * 1.9 - enemy.y) {
-                enemy.speedY *= -1;
-            }
+            let length = Math.hypot(dx, dy);
+            if (length === 0) return;
 
-            enemy.el.style.top = enemy.y + 'px';
+            let dirX = dx / length;
+            let dirY = dy / length;
+
+            enemy.x += dirX * enemy.speedX;
+            enemy.y += dirY * enemy.speedY;
+
             enemy.el.style.left = enemy.x + 'px';
+            enemy.el.style.top = enemy.y + 'px';
+        });
+
+        bullets.forEach((bullet, bIndex) => {
+            enemies.forEach((enemy, eIndex) => {
+                if (isColliding(bullet, bulletSize, enemy, enemySize)) {
+                    bullet.el.remove();
+                    bullets.splice(bIndex, 1);
+
+                    enemy.el.remove();
+                    enemies.splice(eIndex, 1);
+                }
+            })
         });
 
         player.style.top = positionY + 'px';
@@ -116,4 +127,13 @@ function Game() {
     document.addEventListener('keyup', (event) => {
         keysPressed[event.key.toLowerCase()] = false;
     });
+}
+
+function isColliding(a, aSize, b, bSize) {
+    return (
+        a.x < b.x + bSize &&
+        a.x + aSize > b.x &&
+        a.y < b.y + bSize &&
+        a.y + aSize > b.y
+    );
 }
