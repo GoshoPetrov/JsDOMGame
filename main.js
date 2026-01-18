@@ -1,9 +1,47 @@
 function Game() {
     let game = document.getElementById('game');
-    
+
     let player = document.getElementById('player');
     let positionY = 250;
     let positionX = 250;
+
+    let bullets = [];
+    let bulletSpeedX = 20;
+    let bulletSpeedY = 20;
+
+    game.addEventListener('click', (e) => {
+        //debugger;
+        let rect = game.getBoundingClientRect();
+
+        let mouseX = e.clientX - rect.left;
+        let mouseY = e.clientY - rect.top;
+
+        let playerCenterX = positionX + 20;
+        let playerCenterY = positionY + 20;
+
+        let dx = mouseX - playerCenterX;
+        let dy = mouseY - playerCenterY;
+
+        let length = Math.hypot(dx, dy);
+
+        let dirX = dx / length;
+        let dirY = dy / length;
+
+        let div = document.createElement('div');
+        div.classList.add('bullet');
+        game.appendChild(div);
+
+        bullets.push({
+            el: div,
+            x: playerCenterX,
+            y: playerCenterY,
+            dx: dirX,
+            dy: dirY,
+            speed: 8
+        });
+    });
+
+
 
     let enemy = document.getElementById('enemy');
     let enemies = [];
@@ -37,6 +75,20 @@ function Game() {
         if (keysPressed['a']) positionX -= playerSpeed;
         if (keysPressed['d']) positionX += playerSpeed;
 
+        bullets.forEach((p, index) => {
+            p.x += p.dx * p.speed;
+            p.y += p.dy * p.speed;
+
+            p.el.style.left = p.x + 'px';
+            p.el.style.top = p.y + 'px';
+
+            if (p.x < 0 || p.x > game.clientWidth || p.y < 0 || p.y > game.clientHeight
+            ) {
+                p.el.remove();
+                bullets.splice(index, 1);
+            }
+        });
+
         enemies.forEach(enemy => {
             enemy.x += enemy.speedX;
             enemy.y += enemy.speedY;
@@ -55,7 +107,7 @@ function Game() {
 
         player.style.top = positionY + 'px';
         player.style.left = positionX + 'px';
-    }, 1);
+    }, 16);
 
     document.addEventListener('keydown', (event) => {
         keysPressed[event.key.toLowerCase()] = true;
