@@ -1,13 +1,36 @@
 function Game() {
     let game = document.getElementById('game');
 
+    let scoreHtml = document.getElementById('score');
+
     let player = document.getElementById('player');
     let positionY = 250;
     let positionX = 250;
+    let playerSize = 40;
 
     let bullets = [];
     let bulletSpeed = 20;
     let bulletSize = 8;
+
+    let score = 0;
+
+    function spawnEnemy() {
+        let div = document.createElement('div');
+        div.classList.add('enemy');
+        game.appendChild(div);
+
+        enemies.push({
+            el: div,
+            x: Math.random() * (game.clientWidth - enemySize),
+            y: Math.random() * (game.clientHeight - enemySize),
+            speedX: enemySpeedX,
+            speedY: enemySpeedY
+        });
+    }
+
+    setInterval(() => {
+        spawnEnemy();
+    }, 2000);
 
     game.addEventListener('click', (e) => {
         //debugger;
@@ -104,17 +127,28 @@ function Game() {
             enemy.el.style.top = enemy.y + 'px';
         });
 
-        bullets.forEach((bullet, bIndex) => {
-            enemies.forEach((enemy, eIndex) => {
-                if (isColliding(bullet, bulletSize, enemy, enemySize)) {
-                    bullet.el.remove();
+        for (let bIndex = bullets.length - 1; bIndex >= 0; bIndex--) {
+            for (let eIndex = enemies.length - 1; eIndex >= 0; eIndex--) {
+
+                if (IsColliding(bullets[bIndex], bulletSize, enemies[eIndex], enemySize - 20)) {
+
+                    bullets[bIndex].el.remove();
                     bullets.splice(bIndex, 1);
 
-                    enemy.el.remove();
+                    enemies[eIndex].el.remove();
                     enemies.splice(eIndex, 1);
+                    score++;
+                    scoreHtml.textContent = `Score: ${score}`;
+                    break;
                 }
-            })
-        });
+            }
+        }
+
+
+        let clamped = IsPlayerOutOfBounds(positionX, positionY, game, playerSize);
+        positionX = clamped.x;
+        positionY = clamped.y;
+
 
         player.style.top = positionY + 'px';
         player.style.left = positionX + 'px';
@@ -129,7 +163,22 @@ function Game() {
     });
 }
 
-function isColliding(a, aSize, b, bSize) {
+function IsPlayerOutOfBounds(positionX, positionY, game, playerSize) {
+    if (positionX < 0) positionX = 0;
+    if (positionX > game.clientWidth - playerSize) {
+        positionX = game.clientWidth - playerSize;
+    }
+
+    if (positionY < 0) positionY = 0;
+    if (positionY > game.clientHeight - playerSize) {
+        positionY = game.clientHeight - playerSize;
+    }
+
+    return { x: positionX, y: positionY };
+
+}
+
+function IsColliding(a, aSize, b, bSize) {
     return (
         a.x < b.x + bSize &&
         a.x + aSize > b.x &&
@@ -137,3 +186,8 @@ function isColliding(a, aSize, b, bSize) {
         a.y + aSize > b.y
     );
 }
+
+
+
+
+
