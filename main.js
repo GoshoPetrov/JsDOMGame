@@ -7,6 +7,8 @@ function Game() {
     let positionY = 250;
     let positionX = 250;
     let playerSize = 40;
+    let playerHealth = 100;
+    let maxPlayerHealth = 100;
 
     let bullets = [];
     let bulletSpeed = 20;
@@ -19,12 +21,18 @@ function Game() {
         div.classList.add('enemy');
         game.appendChild(div);
 
+        let healthBar = document.createElement('div');
+        healthBar.classList.add('enemy-health');
+        div.appendChild(healthBar);
+
         enemies.push({
             el: div,
             x: Math.random() * (game.clientWidth - enemySize),
             y: Math.random() * (game.clientHeight - enemySize),
             speedX: enemySpeedX,
-            speedY: enemySpeedY
+            speedY: enemySpeedY,
+            health: 30,
+            maxHealth: 30
         });
     }
 
@@ -77,12 +85,18 @@ function Game() {
         div.classList.add('enemy');
         game.appendChild(div);
 
+        let healthBar = document.createElement('div');
+        healthBar.classList.add('enemy-health');
+        div.appendChild(healthBar);
+
         enemies.push({
             el: div,
             x: Math.random() * (game.clientWidth - 40),
             y: Math.random() * (game.clientHeight - 40),
             speedX: enemySpeedX,
-            speedY: enemySpeedY
+            speedY: enemySpeedY,
+            health: 30,
+            maxHealth: 30
         })
     }
     //debugger;
@@ -123,26 +137,56 @@ function Game() {
             enemy.x += dirX * enemy.speedX;
             enemy.y += dirY * enemy.speedY;
 
+            if (IsColliding(
+                { x: positionX, y: positionY },
+                playerSize,
+                enemy,
+                enemySize
+            )) {
+                playerHealth -= 1;
+                updatePlayerHealthBar(playerHealth, maxPlayerHealth);
+            }
+
             enemy.el.style.left = enemy.x + 'px';
             enemy.el.style.top = enemy.y + 'px';
+
         });
 
-        for (let bIndex = bullets.length - 1; bIndex >= 0; bIndex--) {
-            for (let eIndex = enemies.length - 1; eIndex >= 0; eIndex--) {
+        for (let b = bullets.length - 1; b >= 0; b--) {
+            let bullet = bullets[b];
 
-                if (IsColliding(bullets[bIndex], bulletSize, enemies[eIndex], enemySize - 20)) {
+            for (let e = enemies.length - 1; e >= 0; e--) {
+                let enemy = enemies[e];
 
-                    bullets[bIndex].el.remove();
-                    bullets.splice(bIndex, 1);
+                if (bullet.x < enemy.x + enemySize &&
+                    bullet.x + bulletSize > enemy.x &&
+                    bullet.y < enemy.y + enemySize &&
+                    bullet.y + bulletSize > enemy.y) {
 
-                    enemies[eIndex].el.remove();
-                    enemies.splice(eIndex, 1);
-                    score++;
-                    scoreHtml.textContent = `Score: ${score}`;
+                    enemy.health -= 10;
+
+                    const hpBar = enemy.el.querySelector('.enemy-health');
+                    if (hpBar) hpBar.style.width = (enemy.health / enemy.maxHealth) * 100 + '%';
+
+                    bullet.el.remove();
+                    bullets.splice(b, 1);
+
+                    if (enemy.health <= 0) {
+                        enemy.el.remove();
+                        enemies.splice(e, 1);
+                        score++;
+                        scoreHtml.textContent = `Score: ${score}`;
+
+                    }
+
                     break;
                 }
             }
         }
+
+
+
+
 
 
         let clamped = IsPlayerOutOfBounds(positionX, positionY, game, playerSize);
@@ -150,8 +194,9 @@ function Game() {
         positionY = clamped.y;
 
 
-        player.style.top = positionY + 'px';
         player.style.left = positionX + 'px';
+        player.style.top = positionY + 'px';
+
     }, 16);
 
     document.addEventListener('keydown', (event) => {
@@ -185,6 +230,16 @@ function IsColliding(a, aSize, b, bSize) {
         a.y < b.y + bSize &&
         a.y + aSize > b.y
     );
+}
+
+function updatePlayerHealthBar(playerHealth, maxPlayerHealth) {
+    let bar = document.getElementById('player-health');
+    bar.style.width = (playerHealth / maxPlayerHealth) * 100 + '%';
+
+    if (playerHealth <= 0) {
+        alert('Game Over!');
+        location.reload();
+    }
 }
 
 
