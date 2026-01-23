@@ -63,6 +63,14 @@ function Game(enemySpeedX1, enemySpeedY1, enemySpawnInterval) {
             health: 30,
             maxHealth: 30
         });
+
+        div.onmouseover = (ev) => {
+            div.classList.add('enemy-highlight');
+        }
+
+        div.onmouseleave = (ev) => {
+            div.classList.remove('enemy-highlight');
+        }
     };
 
     const spawnInterval = setInterval(spawnEnemy, enemySpawnInterval);

@@ -68,6 +68,11 @@ body, html {
     transition: width 0.1s linear;
 }
 
+.enemy-highlight {
+    transform: scale(1.2);
+    background: rgb(225, 146, 36);
+}
+
 /* HUD (score + player health) */
 #hud {
     position: absolute;
