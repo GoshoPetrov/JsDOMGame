@@ -1,170 +1,134 @@
-function Game() {
-    let game = document.getElementById('game');
+function Game(enemySpeedX1, enemySpeedY1, enemySpawnInterval) {
+    const game = document.getElementById('game');
+    const scoreHtml = document.getElementById('score');
+    const player = document.getElementById('player');
 
-    let scoreHtml = document.getElementById('score');
-
-    let player = document.getElementById('player');
-    let positionY = 250;
-    let positionX = 250;
-    let playerSize = 40;
+    let positionX = 250, positionY = 250;
+    const playerSize = 40;
     let playerHealth = 100;
-    let maxPlayerHealth = 100;
+    const maxPlayerHealth = 100;
 
-    let bullets = [];
-    let bulletSpeed = 20;
-    let bulletSize = 8;
+    const bullets = [];
+    const enemies = [];
+    const bulletSpeed = 25;
+    const bulletSize = 8;
+    const enemySize = 40;
 
     let score = 0;
 
-    function spawnEnemy() {
-        let div = document.createElement('div');
+    const keysPressed = {};
+
+    const keydownHandler = (e) => { keysPressed[e.key.toLowerCase()] = true; };
+    const keyupHandler = (e) => { keysPressed[e.key.toLowerCase()] = false; };
+    document.addEventListener('keydown', keydownHandler);
+    document.addEventListener('keyup', keyupHandler);
+
+    const clickHandler = (e) => {
+        const rect = game.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        const playerCenterX = positionX + playerSize / 2;
+        const playerCenterY = positionY + playerSize / 2;
+
+        const dx = mouseX - playerCenterX;
+        const dy = mouseY - playerCenterY;
+        const length = Math.hypot(dx, dy);
+        const dirX = dx / length;
+        const dirY = dy / length;
+
+        const div = document.createElement('div');
+        div.classList.add('bullet');
+        game.appendChild(div);
+
+        bullets.push({ el: div, x: playerCenterX, y: playerCenterY, dx: dirX, dy: dirY, speed: bulletSpeed });
+    };
+    game.addEventListener('click', clickHandler);
+
+    const spawnEnemy = () => {
+        const div = document.createElement('div');
         div.classList.add('enemy');
         game.appendChild(div);
 
-        let healthBar = document.createElement('div');
-        healthBar.classList.add('enemy-health');
-        div.appendChild(healthBar);
+        const hpBar = document.createElement('div');
+        hpBar.classList.add('enemy-health');
+        div.appendChild(hpBar);
 
         enemies.push({
             el: div,
             x: Math.random() * (game.clientWidth - enemySize),
             y: Math.random() * (game.clientHeight - enemySize),
-            speedX: enemySpeedX,
-            speedY: enemySpeedY,
+            speedX: enemySpeedX1,
+            speedY: enemySpeedY1,
             health: 30,
             maxHealth: 30
         });
-    }
+    };
 
-    setInterval(() => {
-        spawnEnemy();
-    }, 2000);
+    const spawnInterval = setInterval(spawnEnemy, enemySpawnInterval);
 
-    game.addEventListener('click', (e) => {
-        //debugger;
-        let rect = game.getBoundingClientRect();
+    const loopInterval = setInterval(() => {
+        const playerSpeed = 10;
 
-        let mouseX = e.clientX - rect.left;
-        let mouseY = e.clientY - rect.top;
-
-        let playerCenterX = positionX + 20;
-        let playerCenterY = positionY + 20;
-
-        let dx = mouseX - playerCenterX;
-        let dy = mouseY - playerCenterY;
-
-        let length = Math.hypot(dx, dy);
-
-        let dirX = dx / length;
-        let dirY = dy / length;
-
-        let div = document.createElement('div');
-        div.classList.add('bullet');
-        game.appendChild(div);
-
-        bullets.push({
-            el: div,
-            x: playerCenterX,
-            y: playerCenterY,
-            dx: dirX,
-            dy: dirY,
-            speed: bulletSpeed
-        });
-    });
-
-
-
-    let enemies = [];
-    let enemiesCount = 5;
-    let enemySpeedX = 2;
-    let enemySpeedY = 2;
-    let enemySize = 40;
-
-    for (let i = 0; i < enemiesCount; i++) {
-        let div = document.createElement('div');
-        div.classList.add('enemy');
-        game.appendChild(div);
-
-        let healthBar = document.createElement('div');
-        healthBar.classList.add('enemy-health');
-        div.appendChild(healthBar);
-
-        enemies.push({
-            el: div,
-            x: Math.random() * (game.clientWidth - 40),
-            y: Math.random() * (game.clientHeight - 40),
-            speedX: enemySpeedX,
-            speedY: enemySpeedY,
-            health: 30,
-            maxHealth: 30
-        })
-    }
-    //debugger;
-    let playerSpeed = 10;
-
-    const keysPressed = {};
-
-    let moveInterval = setInterval(() => {
         if (keysPressed['w']) positionY -= playerSpeed;
         if (keysPressed['s']) positionY += playerSpeed;
         if (keysPressed['a']) positionX -= playerSpeed;
         if (keysPressed['d']) positionX += playerSpeed;
 
-        bullets.forEach((p, index) => {
-            p.x += p.dx * p.speed;
-            p.y += p.dy * p.speed;
+        positionX = Math.max(0, Math.min(game.clientWidth - playerSize, positionX));
+        positionY = Math.max(0, Math.min(game.clientHeight - playerSize, positionY));
 
-            p.el.style.left = p.x + 'px';
-            p.el.style.top = p.y + 'px';
+        player.style.left = positionX + 'px';
+        player.style.top = positionY + 'px';
 
-            if (p.x < 0 || p.x > game.clientWidth || p.y < 0 || p.y > game.clientHeight
-            ) {
-                p.el.remove();
-                bullets.splice(index, 1);
+        for (let i = bullets.length - 1; i >= 0; i--) {
+            const b = bullets[i];
+            b.x += b.dx * b.speed;
+            b.y += b.dy * b.speed;
+
+            b.el.style.left = b.x + 'px';
+            b.el.style.top = b.y + 'px';
+
+            if (b.x < 0 || b.x > game.clientWidth || b.y < 0 || b.y > game.clientHeight) {
+                b.el.remove();
+                bullets.splice(i, 1);
             }
-        });
+        }
 
-        enemies.forEach(enemy => {
-            let dx = positionX - enemy.x;
-            let dy = positionY - enemy.y;
+        for (let i = enemies.length - 1; i >= 0; i--) {
+            const e = enemies[i];
 
-            let length = Math.hypot(dx, dy);
-            if (length === 0) return;
+            const dx = positionX - e.x;
+            const dy = positionY - e.y;
+            const length = Math.hypot(dx, dy);
+            const dirX = dx / length;
+            const dirY = dy / length;
 
-            let dirX = dx / length;
-            let dirY = dy / length;
+            e.x += dirX * e.speedX;
+            e.y += dirY * e.speedY;
 
-            enemy.x += dirX * enemy.speedX;
-            enemy.y += dirY * enemy.speedY;
+            e.el.style.left = e.x + 'px';
+            e.el.style.top = e.y + 'px';
 
-            if (IsColliding(
-                { x: positionX, y: positionY },
-                playerSize,
-                enemy,
-                enemySize
-            )) {
+            // Player collision
+            if (IsColliding({ x: positionX, y: positionY }, playerSize, e, enemySize)) {
                 playerHealth -= 1;
-                updatePlayerHealthBar(playerHealth, maxPlayerHealth);
+                document.getElementById('player-health').style.width = (playerHealth / maxPlayerHealth) * 100 + '%';
+                if (playerHealth <= 0) {
+                    stop(); // stop intervals
+                    showEndScreen(score);
+                    return;
+                }
             }
+        }
 
-            enemy.el.style.left = enemy.x + 'px';
-            enemy.el.style.top = enemy.y + 'px';
-
-        });
-
+        // Bullet vs enemy collision
         for (let b = bullets.length - 1; b >= 0; b--) {
-            let bullet = bullets[b];
-
+            const bullet = bullets[b];
             for (let e = enemies.length - 1; e >= 0; e--) {
-                let enemy = enemies[e];
-
-                if (bullet.x < enemy.x + enemySize &&
-                    bullet.x + bulletSize > enemy.x &&
-                    bullet.y < enemy.y + enemySize &&
-                    bullet.y + bulletSize > enemy.y) {
-
+                const enemy = enemies[e];
+                if (IsColliding(bullet, bulletSize, enemy, enemySize)) {
                     enemy.health -= 10;
-
                     const hpBar = enemy.el.querySelector('.enemy-health');
                     if (hpBar) hpBar.style.width = (enemy.health / enemy.maxHealth) * 100 + '%';
 
@@ -176,37 +140,32 @@ function Game() {
                         enemies.splice(e, 1);
                         score++;
                         scoreHtml.textContent = `Score: ${score}`;
-
                     }
-
                     break;
                 }
             }
         }
 
-
-
-
-
-
-        let clamped = IsPlayerOutOfBounds(positionX, positionY, game, playerSize);
-        positionX = clamped.x;
-        positionY = clamped.y;
-
-
-        player.style.left = positionX + 'px';
-        player.style.top = positionY + 'px';
-
     }, 16);
 
-    document.addEventListener('keydown', (event) => {
-        keysPressed[event.key.toLowerCase()] = true;
-    });
+    function stop() {
+        clearInterval(loopInterval);
+        clearInterval(spawnInterval);
 
-    document.addEventListener('keyup', (event) => {
-        keysPressed[event.key.toLowerCase()] = false;
-    });
+        bullets.forEach(b => b.el.remove());
+        enemies.forEach(e => e.el.remove());
+
+        bullets.length = 0;
+        enemies.length = 0;
+
+        document.removeEventListener('keydown', keydownHandler);
+        document.removeEventListener('keyup', keyupHandler);
+        game.removeEventListener('click', clickHandler);
+    }
+
+    return { stop };
 }
+
 
 function IsPlayerOutOfBounds(positionX, positionY, game, playerSize) {
     if (positionX < 0) positionX = 0;
@@ -243,6 +202,116 @@ function updatePlayerHealthBar(playerHealth, maxPlayerHealth) {
 }
 
 
+
+function StartScreen() {
+    const startScreen = document.getElementById('start-screen');
+    const buttons = document.querySelectorAll('#difficulty-buttons button');
+    const dragBox = document.getElementById('drag-box');
+
+    buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const difficulty = btn.dataset.difficulty;
+            startScreen.style.display = 'none';
+            document.getElementById('game').style.display = 'block';
+            document.getElementById('hud').style.display = 'flex';
+
+            switch (difficulty) {
+                case 'easy':
+                    window.enemySpeedX = 2;
+                    window.enemySpeedY = 2;
+                    window.enemySpawnInterval = 2000;
+                    break;
+                case 'hard':
+                    window.enemySpeedX = 5;
+                    window.enemySpeedY = 5;
+                    window.enemySpawnInterval = 800;
+                    break;
+                case 'impossible':
+                    window.enemySpeedX = 9;
+                    window.enemySpeedY = 9;
+                    window.enemySpawnInterval = 450;
+                    break;
+            }
+
+            Game(window.enemySpeedX, window.enemySpeedY, window.enemySpawnInterval);
+        });
+    });
+
+    let offsetX, offsetY, dragging = false;
+
+    dragBox.addEventListener('mousedown', (e) => {
+        dragging = true;
+        dragBox.classList.add('dragging');
+        offsetX = e.offsetX;
+        offsetY = e.offsetY;
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!dragging) return;
+        dragBox.style.left = `${e.clientX - offsetX}px`;
+        dragBox.style.top = `${e.clientY - offsetY}px`;
+    });
+
+    document.addEventListener('mouseup', () => {
+        dragging = false;
+        dragBox.classList.remove('dragging');
+    });
+}
+
+
+window.onload = StartScreen;
+
+
+function updatePlayerHealthBar(playerHealth, maxPlayerHealth, score) {
+    const bar = document.getElementById('player-health');
+    bar.style.width = (playerHealth / maxPlayerHealth) * 100 + '%';
+
+    if (playerHealth <= 0) {
+        playerHealth = 100;
+        enemiesCount = 0;
+        showEndScreen(score);
+    }
+}
+
+
+function setupEndScreen() {
+    const endScreen = document.getElementById('end-screen');
+    const tryAgainBtn = document.getElementById('try-again');
+    const finalScore = document.getElementById('final-score');
+    const bestScore = document.getElementById('best-score');
+
+    window.showEndScreen = function(score) {
+
+        finalScore.textContent = `Score: ${score}`;
+
+        const best = localStorage.getItem('bestScore') || 0;
+        if (score > best) localStorage.setItem('bestScore', score);
+
+        bestScore.textContent = `Best: ${localStorage.getItem('bestScore')}`;
+
+        endScreen.style.display = 'flex';
+
+        document.getElementById('game').style.display = 'none';
+        document.getElementById('hud').style.display = 'none';
+    };
+
+    tryAgainBtn.addEventListener('click', () => {
+
+        endScreen.style.display = 'none';
+
+        if (window.gameInstance && window.gameInstance.stop) {
+            window.gameInstance.stop(); 
+        }
+
+        document.getElementById('score').textContent = 'Score: 0';
+        document.getElementById('player-health').style.width = '100%';
+
+        document.getElementById('start-screen').style.display = 'flex';
+    });
+}
+
+
+document.addEventListener('DOMContentLoaded', setupEndScreen);
 
 
 

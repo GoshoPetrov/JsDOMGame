@@ -1,27 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Top-Down Shooter</title>
+<link rel="stylesheet" href="style.css">
 </head>
+<body>
 
-<body onload="Game()">
-    <div id="game">
-        <div id='player'></div>
-        <div id="enemy"></div>
-        <div id="bullet"></div>
-        <div id="score">Score: 0</div>
-        <div id="player-hud">
-            <div id="player-health"></div>
-        </div>
 
+
+<div id="end-screen" style="display:none;">
+    <h1>You Died</h1>
+    <div id="final-score">Score: 0</div>
+    <div id="best-score">Best: 0</div>
+    <button id="try-again">Try Again</button>
+</div>
+
+
+<div id="start-screen">
+    <h1>Top-Down Shooter</h1>
+    <div id="difficulty-buttons">
+        <button data-difficulty="easy">Easy</button>
+        <button data-difficulty="hard">Hard</button>
+        <button data-difficulty="impossible">Impossible</button>
     </div>
+    <p>Drag the box!</p>
+    <div id="drag-box"></div>
+</div>
 
 
-    <script src="main.js"></script>
+<div id="game" style="display:none;">
+    <div id="player"></div>
+</div>
+
+
+<div id="hud" style="display:none;">
+    <div id="player-hud">
+        <div id="player-health"></div>
+    </div>
+    <div id="score">Score: 0</div>
+</div>
+
+<script src="main.js"></script>
 </body>
-
 </html>

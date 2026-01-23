@@ -1,73 +1,95 @@
-#player {
-    width: 50px;
-    height: 50px;
-    background-color: black;
-    position: absolute;
-    top: 250px;
-    left: 250px;
-}
+/* Reset */
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-.bullet {
-    width: 15px;
-    height: 15px;
-    background-color: red;
-    position: absolute;
-    border-radius: 50%;
-    z-index: 10;
-    top: 10000px;
-    left: 10000px;
-}
-
-#game {
-    width: 800px;
-    height: 600px;
-    border: 3px solid black;
-    position: relative;
-    margin: 20px auto;
+body, html {
+    width: 100%;
+    height: 100%;
+    background: #111;
+    font-family: Arial, sans-serif;
     overflow: hidden;
 }
 
-.enemy {
-    width: 25px;
-    height: 25px;
-    background-color: blue;
-    position: absolute;
-    top: 10000px;
-    left: 10000px;
+/* Game area */
+#game {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #222;
+    overflow: hidden;
 }
 
-#score {
+/* Player */
+#player {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: cyan;
+    border-radius: 6px;
+    top: 250px;
+    left: 250px;
+    z-index: 10;
+    box-shadow: 0 0 8px #0ff;
+    transition: transform 0.1s linear;
+}
+
+/* Bullets */
+.bullet {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: yellow;
+    border-radius: 50%;
+    z-index: 5;
+    box-shadow: 0 0 4px #ff0;
+}
+
+/* Enemies */
+.enemy {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: red;
+    border-radius: 6px;
+    z-index: 5;
+    box-shadow: 0 0 8px #f00;
+}
+
+/* Enemy health bar */
+.enemy-health {
+    position: absolute;
+    top: -10px;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    background: limegreen;
+    border-radius: 4px;
+    box-shadow: 0 0 2px #000;
+    pointer-events: none;
+    transition: width 0.1s linear;
+}
+
+/* HUD (score + player health) */
+#hud {
     position: absolute;
     top: 10px;
     left: 10px;
-
-    padding: 8px 14px;
-
-    font-family: Arial, sans-serif;
-    font-size: 20px;
-    font-weight: bold;
-
-    color: white;
-    background: rgba(0, 0, 0, 0.6);
-
-    border-radius: 8px;
-    user-select: none;
-
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    color: #fff;
     z-index: 1000;
 }
 
+/* Player health bar container */
 #player-hud {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
     width: 200px;
-    height: 16px;
+    height: 20px;
     background: #333;
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: hidden;
-    z-index: 1000;
 }
 
+/* Player health */
 #player-health {
     height: 100%;
     width: 100%;
@@ -75,15 +97,216 @@
     transition: width 0.1s linear;
 }
 
+/* Score */
+#score {
+    font-size: 20px;
+    font-weight: bold;
+    text-shadow: 0 0 4px #000;
+}
+/* Reset */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body, html {
+    width: 100%;
+    height: 100%;
+    background: #111;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
+
+/* Game area */
+#game {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #222;
+    overflow: hidden;
+}
+
+/* Player */
+#player {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: cyan;
+    border-radius: 6px;
+    top: 250px;
+    left: 250px;
+    z-index: 10;
+    box-shadow: 0 0 8px #0ff;
+    transition: transform 0.1s linear;
+}
+
+/* Bullets */
+.bullet {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: yellow;
+    border-radius: 50%;
+    z-index: 5;
+    box-shadow: 0 0 4px #ff0;
+}
+
+/* Enemies */
+.enemy {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: red;
+    border-radius: 6px;
+    z-index: 5;
+    box-shadow: 0 0 8px #f00;
+}
+
+/* Enemy health bar */
 .enemy-health {
     position: absolute;
     top: -10px;
     left: 0;
     width: 100%;
     height: 8px;
-    background: red;
+    background: limegreen;
     border-radius: 4px;
+    box-shadow: 0 0 2px #000;
     pointer-events: none;
-    box-shadow: 0 0 4px #000;
+    transition: width 0.1s linear;
 }
 
+/* HUD (score + player health) */
+#hud {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    color: #fff;
+    z-index: 1000;
+}
+
+/* Player health bar container */
+#player-hud {
+    width: 200px;
+    height: 20px;
+    background: #333;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Player health */
+#player-health {
+    height: 100%;
+    width: 100%;
+    background: limegreen;
+    transition: width 0.1s linear;
+}
+
+/* Score */
+#score {
+    font-size: 20px;
+    font-weight: bold;
+    text-shadow: 0 0 4px #000;
+}
+
+/* Start Screen */
+#start-screen {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background: #111;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+#start-screen h1 {
+    font-size: 48px;
+    margin-bottom: 30px;
+    text-shadow: 0 0 8px #0ff;
+}
+
+#difficulty-buttons {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 50px;
+}
+
+#difficulty-buttons button {
+    padding: 15px 30px;
+    font-size: 20px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.1s ease, background 0.2s ease;
+}
+
+#difficulty-buttons button:hover {
+    transform: scale(1.1);
+    background: #0ff;
+    color: #000;
+}
+
+/* Drag box */
+#drag-box {
+    width: 80px;
+    height: 80px;
+    background: yellow;
+    border-radius: 8px;
+    cursor: grab;
+    box-shadow: 0 0 8px #ff0;
+    position: relative;
+}
+#drag-box.dragging {
+    opacity: 0.7;
+    cursor: grabbing;
+}
+
+
+
+#end-screen {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.95);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: red;
+    z-index: 3000;
+}
+
+#end-screen h1 {
+    font-size: 60px;
+    margin-bottom: 30px;
+    text-shadow: 0 0 10px #f00;
+}
+
+#end-screen button {
+    padding: 15px 30px;
+    font-size: 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: transform 0.1s ease, background 0.2s ease;
+}
+
+#end-screen button:hover {
+    transform: scale(1.1);
+    background: red;
+    color: #fff;
+}
+
+#end-screen div {
+    font-size: 24px;
+    margin-top: 10px;
+    color: #fff;
+}
